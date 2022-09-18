@@ -1,0 +1,692 @@
+SELECT 
+CASE 
+    WHEN stars BETWEEN 2 AND 3 THEN '2-3' 
+    WHEN stars >= 4 THEN  '4-5'
+    ELSE 'Others'
+END AS star_category
+,COUNT (id)
+FROM business
+WHERE city ='Las Vegas' 
+AND (SELECT business_id FROM category WHERE category ='Restaurants' )
+GROUP BY star_category
+
++---------------+------------+
+| star_category | COUNT (id) |
++---------------+------------+
+| 2-3           |        403 |
+| 4-5           |        838 |
+| Others        |        320 |
++---------------+------------+
+_______________________________________________________________________________________
+SELECT 
+CASE 
+    WHEN b.stars BETWEEN 2 AND 3 THEN '2-3' 
+    WHEN b.stars >= 4 THEN  '4-5'
+    ELSE 'Others'
+END AS star_category
+,COUNT (b.id)
+FROM category c 
+LEFT JOIN business b
+ON b.id=c.business_id
+WHERE b. city ='Las Vegas' 
+GROUP BY star_category
+
++---------------+--------------+
+| star_category | COUNT (b.id) |
++---------------+--------------+
+| 2-3           |           10 |
+| 4-5           |           57 |
+| Others        |           11 |
++---------------+--------------+
+
+_______________________________________________________________________________________
+
+SELECT category, COUNT(business_id)
+FROM category
+GROUP BY category
+ORDER BY COUNT(business_id) DESC
+
++---------------------------+--------------------+
+| category                  | COUNT(business_id) |
++---------------------------+--------------------+
+| Restaurants               |                912 |
+| Food                      |                425 |
+| Shopping                  |                405 |
+| Beauty & Spas             |                224 |
+| Nightlife                 |                214 |
+| Home Services             |                203 |
+| Health & Medical          |                196 |
+| Bars                      |                185 |
+| Local Services            |                166 |
+| Automotive                |                163 |
+| Active Life               |                122 |
+| Event Planning & Services |                119 |
+| American (Traditional)    |                105 |
+| Fast Food                 |                104 |
+| Fashion                   |                 98 |
+| Coffee & Tea              |                 92 |
+| Sandwiches                |                 90 |
+| Pizza                     |                 89 |
+| Arts & Entertainment      |                 87 |
+| Hotels & Travel           |                 86 |
+| Auto Repair               |                 84 |
+| Burgers                   |                 81 |
+| Italian                   |                 81 |
+| Specialty Food            |                 79 |
+| Hair Salons               |                 78 |
++---------------------------+--------------------+
+(Output limit exceeded, 25 of 712 total rows shown)
+
+SELECT category, COUNT(business_id)
+FROM category
+
++-------------+--------------------+
+| category    | COUNT(business_id) |
++-------------+--------------------+
+| Restaurants |              10000 |
++-------------+--------------------+
+
+_________________________________________________________________________________
+
+SELECT b.city, COUNT(business_id)
+FROM business b 
+LEFT JOIN category c
+ON b.id = c.business_id
+WHERE c.category ='Restaurants'
+GROUP BY b.city
+ORDER BY COUNT(business_id) DESC
+
++-----------------+--------------------+
+| city            | COUNT(business_id) |
++-----------------+--------------------+
+| Toronto         |                 10 |
+| Phoenix         |                  6 |
+| Las Vegas       |                  4 |
+| Mississauga     |                  4 |
+| Edinburgh       |                  3 |
+| Chandler        |                  2 |
+| Charlotte       |                  2 |
+| Cleveland       |                  2 |
+| Mesa            |                  2 |
+| Montréal        |                  2 |
+| Pittsburgh      |                  2 |
+| Aurora          |                  1 |
+| Brampton        |                  1 |
+| Champaign       |                  1 |
+| Chesterland     |                  1 |
+| Coraopolis      |                  1 |
+| Cuyahoga Falls  |                  1 |
+| Fitchburg       |                  1 |
+| Fountain Hills  |                  1 |
+| Gilbert         |                  1 |
+| Glendale        |                  1 |
+| Hemmingen       |                  1 |
+| Hudson          |                  1 |
+| Inverness       |                  1 |
+| Litchfield Park |                  1 |
++-----------------+--------------------+
+(Output limit exceeded, 25 of 43 total rows shown)
+
+_______________________________________________________________________________________
+
+SELECT b.city, COUNT(business_id)
+FROM business b 
+LEFT JOIN category c
+ON b.id = c.business_id
+WHERE b.city ='Las Vegas'
+GROUP BY b.city
+ORDER BY COUNT(business_id) DESC
+
++-----------+--------------------+
+| city      | COUNT(business_id) |
++-----------+--------------------+
+| Las Vegas |                 78 |
++-----------+--------------------+
+
+_______________________________________________________________________________________
+
+
+SELECT c.category, COUNT(business_id)
+FROM business b 
+LEFT JOIN category c
+ON b.id = c.business_id
+WHERE b.city ='Las Vegas'
+GROUP BY c.category
+ORDER BY COUNT(business_id) DESC
+
+
++------------------------------+--------------------+
+| category                     | COUNT(business_id) |
++------------------------------+--------------------+
+| Health & Medical             |                  4 |
+| Restaurants                  |                  4 |
+| Shopping                     |                  4 |
+| American (New)               |                  2 |
+| Beauty & Spas                |                  2 |
+| Doctors                      |                  2 |
+| Food                         |                  2 |
+| Home Services                |                  2 |
+| Hotels & Travel              |                  2 |
+| Active Life                  |                  1 |
+| Apartments                   |                  1 |
+| Arcades                      |                  1 |
+| Arts & Entertainment         |                  1 |
+| Asian Fusion                 |                  1 |
+| Bakeries                     |                  1 |
+| Bars                         |                  1 |
+| Breakfast & Brunch           |                  1 |
+| Chicken Wings                |                  1 |
+| Chinese                      |                  1 |
+| Chiropractors                |                  1 |
+| Chocolatiers & Shops         |                  1 |
+| Community Service/Non-Profit |                  1 |
+| Convenience Stores           |                  1 |
+| Cosmetics & Beauty Supply    |                  1 |
+| Dentists                     |                  1 |
++------------------------------+--------------------+
+(Output limit exceeded, 25 of 64 total rows shown)
+_______________________________________________________________________________________
+
+
+SELECT b.city,c.category, COUNT(business_id)
+FROM business b 
+LEFT JOIN category c
+ON b.id = c.business_id
+GROUP BY b.city, c.category
+ORDER BY COUNT(business_id) DESC
+
++-------------+------------------------+--------------------+
+| city        | category               | COUNT(business_id) |
++-------------+------------------------+--------------------+
+| Toronto     | Restaurants            |                 10 |
+| Phoenix     | Restaurants            |                  6 |
+| Chandler    | Shopping               |                  4 |
+| Las Vegas   | Health & Medical       |                  4 |
+| Las Vegas   | Restaurants            |                  4 |
+| Las Vegas   | Shopping               |                  4 |
+| Mississauga | Restaurants            |                  4 |
+| Phoenix     | Food                   |                  4 |
+| Phoenix     | Home Services          |                  4 |
+| Toronto     | Bars                   |                  4 |
+| Toronto     | Food                   |                  4 |
+| Toronto     | Nightlife              |                  4 |
+| Toronto     | Shopping               |                  4 |
+| Charlotte   | Shopping               |                  3 |
+| Cleveland   | Food                   |                  3 |
+| Edinburgh   | Restaurants            |                  3 |
+| Phoenix     | American (Traditional) |                  3 |
+| Phoenix     | Health & Medical       |                  3 |
+| Toronto     | Active Life            |                  3 |
+| Toronto     | Beauty & Spas          |                  3 |
+| Toronto     | Japanese               |                  3 |
+| Toronto     | Pubs                   |                  3 |
+| Toronto     | Sushi Bars             |                  3 |
+| Chandler    | Auto Repair            |                  2 |
+| Chandler    | Automotive             |                  2 |
++-------------+------------------------+--------------------+
+(Output limit exceeded, 25 of 943 total rows shown)
+
+
+_______________________________________________________________________________________
+
+SELECT * 
+FROM hours
+
++-----------------------+------------------------+
+| hours                 | business_id            |
++-----------------------+------------------------+
+| Monday|10:00-21:00    | YDf95gJZaq05wvo7hTQbbQ |
+| Tuesday|10:00-21:00   | YDf95gJZaq05wvo7hTQbbQ |
+| Friday|10:00-21:00    | YDf95gJZaq05wvo7hTQbbQ |
+| Wednesday|10:00-21:00 | YDf95gJZaq05wvo7hTQbbQ |
+| Thursday|10:00-21:00  | YDf95gJZaq05wvo7hTQbbQ |
+| Sunday|11:00-18:00    | YDf95gJZaq05wvo7hTQbbQ |
+| Saturday|10:00-21:00  | YDf95gJZaq05wvo7hTQbbQ |
+| Monday|10:00-22:00    | mLwM-h2YhXl2NCgdS84_Bw |
+| Tuesday|10:00-22:00   | mLwM-h2YhXl2NCgdS84_Bw |
+| Friday|10:00-22:00    | mLwM-h2YhXl2NCgdS84_Bw |
+| Wednesday|10:00-22:00 | mLwM-h2YhXl2NCgdS84_Bw |
+| Thursday|10:00-22:00  | mLwM-h2YhXl2NCgdS84_Bw |
+| Sunday|10:00-22:00    | mLwM-h2YhXl2NCgdS84_Bw |
+| Saturday|10:00-22:00  | mLwM-h2YhXl2NCgdS84_Bw |
+| Monday|10:00-19:00    | v2WhjAB3PIBA8J8VxG3wEg |
+| Tuesday|10:00-19:00   | v2WhjAB3PIBA8J8VxG3wEg |
+| Friday|10:00-19:00    | v2WhjAB3PIBA8J8VxG3wEg |
+| Wednesday|10:00-19:00 | v2WhjAB3PIBA8J8VxG3wEg |
+| Thursday|10:00-19:00  | v2WhjAB3PIBA8J8VxG3wEg |
+| Sunday|12:00-17:00    | v2WhjAB3PIBA8J8VxG3wEg |
+| Saturday|10:00-18:00  | v2WhjAB3PIBA8J8VxG3wEg |
+| Friday|9:00-17:00     | CVtCbSB1zUcUWg-9TNGTuQ |
+| Tuesday|9:00-17:00    | CVtCbSB1zUcUWg-9TNGTuQ |
+| Thursday|9:00-17:00   | CVtCbSB1zUcUWg-9TNGTuQ |
+| Wednesday|9:00-17:00  | CVtCbSB1zUcUWg-9TNGTuQ |
++-----------------------+------------------------+
+(Output limit exceeded, 25 of 10000 total rows shown)
+
+_______________________________________________________________________________________
+
+
+SELECT c.business_id
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+
++------------------------+
+| business_id            |
++------------------------+
+| 1aj4TG0eFq6NaPBKk6bK7Q |
+| 1CP8aJa8ILlfM5deroar0Q |
+| 1ZnVfS-qP19upP_fwOhZsA |
+| 36PyJL7VPM6Xd6agqXj5RQ |
++------------------------+
+
+_______________________________________________________________________________________
+
+SELECT c.business_id, h.hours
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+LEFT JOIN hours h
+ON c.business_id = h.business_id
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+
++------------------------+-----------------------+
+| business_id            | hours                 |
++------------------------+-----------------------+
+| 1aj4TG0eFq6NaPBKk6bK7Q | Monday|11:00-20:00    |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Tuesday|11:00-20:00   |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Friday|11:00-20:00    |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Wednesday|11:00-20:00 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Thursday|11:00-20:00  |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Sunday|8:00-14:00     |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Saturday|11:00-20:00  |
+| 1CP8aJa8ILlfM5deroar0Q | Monday|11:00-0:00     |
+| 1CP8aJa8ILlfM5deroar0Q | Tuesday|11:00-0:00    |
+| 1CP8aJa8ILlfM5deroar0Q | Friday|11:00-0:00     |
+| 1CP8aJa8ILlfM5deroar0Q | Wednesday|11:00-0:00  |
+| 1CP8aJa8ILlfM5deroar0Q | Thursday|11:00-0:00   |
+| 1CP8aJa8ILlfM5deroar0Q | Sunday|11:00-0:00     |
+| 1CP8aJa8ILlfM5deroar0Q | Saturday|11:00-0:00   |
+| 1ZnVfS-qP19upP_fwOhZsA | Monday|10:00-23:00    |
+| 1ZnVfS-qP19upP_fwOhZsA | Tuesday|10:00-23:00   |
+| 1ZnVfS-qP19upP_fwOhZsA | Friday|10:00-23:00    |
+| 1ZnVfS-qP19upP_fwOhZsA | Wednesday|10:00-23:00 |
+| 1ZnVfS-qP19upP_fwOhZsA | Thursday|10:00-23:00  |
+| 1ZnVfS-qP19upP_fwOhZsA | Sunday|10:00-23:00    |
+| 1ZnVfS-qP19upP_fwOhZsA | Saturday|10:00-23:00  |
+| 36PyJL7VPM6Xd6agqXj5RQ | None                  |
++------------------------+-----------------------+
+
+_______________________________________________________________________________________
+
+
+SELECT c.business_id, b.stars
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+
+
+
++------------------------+-------+
+| business_id            | stars |
++------------------------+-------+
+| 1aj4TG0eFq6NaPBKk6bK7Q |   4.0 |
+| 1CP8aJa8ILlfM5deroar0Q |   3.0 |
+| 1ZnVfS-qP19upP_fwOhZsA |   4.0 |
+| 36PyJL7VPM6Xd6agqXj5RQ |   4.5 |
++------------------------+-------+
+
+_______________________________________________________________________________________
+
+
+SELECT 
+CASE
+    WHEN b.stars BETWEEN 2 AND 3  THEN '2-3'
+    WHEN b.stars >=4  THEN '4-5'
+    ELSE 'Others'
+END AS StarCategory
+,COUNT (*)
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+GROUP BY StarCategory
+
+
++--------------+-----------+
+| StarCategory | COUNT (*) |
++--------------+-----------+
+| 2-3          |         1 |
+| 4-5          |         3 |
++--------------+-----------+
+
+_______________________________________________________________________________________
+
+SELECT c.business_id,b.name, h.hours, b.stars
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+LEFT JOIN hours h
+ON c.business_id = h.business_id
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+
++------------------------+---------------------+-----------------------+-------+
+| business_id            | name                | hours                 | stars |
++------------------------+---------------------+-----------------------+-------+
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Monday|11:00-20:00    |   4.0 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Tuesday|11:00-20:00   |   4.0 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Friday|11:00-20:00    |   4.0 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Wednesday|11:00-20:00 |   4.0 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Thursday|11:00-20:00  |   4.0 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Sunday|8:00-14:00     |   4.0 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        | Saturday|11:00-20:00  |   4.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Monday|11:00-0:00     |   3.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Tuesday|11:00-0:00    |   3.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Friday|11:00-0:00     |   3.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Wednesday|11:00-0:00  |   3.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Thursday|11:00-0:00   |   3.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Sunday|11:00-0:00     |   3.0 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            | Saturday|11:00-0:00   |   3.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Monday|10:00-23:00    |   4.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Tuesday|10:00-23:00   |   4.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Friday|10:00-23:00    |   4.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Wednesday|10:00-23:00 |   4.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Thursday|10:00-23:00  |   4.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Sunday|10:00-23:00    |   4.0 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant | Saturday|10:00-23:00  |   4.0 |
+| 36PyJL7VPM6Xd6agqXj5RQ | Hibachi-San         | None                  |   4.5 |
++------------------------+---------------------+-----------------------+-------+
+
+_______________________________________________________________________________________
+
+SELECT c.business_id,b.name, COUNT(*)
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+LEFT JOIN review r 
+ON c.business_id = r.business_id
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+GROUP BY b.id 
+
+
++------------------------+---------------------+----------+
+| business_id            | name                | COUNT(*) |
++------------------------+---------------------+----------+
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            |        1 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant |        2 |
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        |        1 |
+| 36PyJL7VPM6Xd6agqXj5RQ | Hibachi-San         |        1 |
++------------------------+---------------------+----------+
+
+_______________________________________________________________________________________
+
+
+SELECT c.business_id,b.name, r.text
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+LEFT JOIN review r 
+ON c.business_id = r.business_id
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+
+
++------------------------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| business_id            | name                |                                                                                                                                                                                                                                                                                                                                                                                                   text |
++------------------------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        |                                                                                                                                                                                                                                                                                                                                                                                                   None |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            |                                                                                                                                                                                                                                                                                                                                                                                                   None |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant |                                                                                                                                                                                                                My brother was in town and wanted to get a quick lunch before I had to go into work. Wanted to go into Monta but it was 11 and they weren't open yet, so we stopped in at the Big Wong. |
+|                        |                     |                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                        |                     | Beef Ramen - for 5 you can get a bowl of ramen (same noodles as used at Monta) and it comes with big chunks of beef. They'll ask you for tendons too and I don't remember if they charge you extra, but I don't think so. Came with chili oil, scallions, and siracha on the side. It was good, and it's exactly what you expect to get, ramen and beef. Great flavor and the broth was well seasoned. |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant |                                                                                                                                                                                                                                                                                                       This restaurant has great service. Their foods are very delicious and not expensive. Thank you!! |
+| 36PyJL7VPM6Xd6agqXj5RQ | Hibachi-San         |                                                                                                                                                                                                                                                                                                                                                                                                   None |
++------------------------+---------------------+-----------------------------------------
+
+
+_______________________________________________________________________________________
+
+SELECT b.id, b.name, b.review_count
+FROM business b  
+LEFT JOIN category c
+ON c.business_id = b.id 
+WHERE c.category = 'Restaurants' AND b.city ='Las Vegas'
+
++------------------------+---------------------+--------------+
+| id                     | name                | review_count |
++------------------------+---------------------+--------------+
+| 1aj4TG0eFq6NaPBKk6bK7Q | Jacques Cafe        |          168 |
+| 1CP8aJa8ILlfM5deroar0Q | Wingstop            |          123 |
+| 1ZnVfS-qP19upP_fwOhZsA | Big Wong Restaurant |          768 |
+| 36PyJL7VPM6Xd6agqXj5RQ | Hibachi-San         |            3 |
++------------------------+---------------------+--------------+
+
+_______________________________________________________________________________________
+
+SELECT b.is_open, COUNT (*) AS total_biz
+FROM business b
+GROUP BY b.is_open 
+
+
++---------+-----------+
+| is_open | total_biz |
++---------+-----------+
+|       0 |      1520 |
+|       1 |      8480 |
++---------+-----------+
+
+
+_______________________________________________________________________________________
+
+SELECT is_open, stars, COUNT(stars) AS rating_totals
+FROM business
+GROUP BY is_open, stars
+ORDER BY stars
+
++---------+-------+---------------+
+| is_open | stars | rating_totals |
++---------+-------+---------------+
+|       0 |   1.0 |            14 |
+|       1 |   1.0 |           142 |
+|       0 |   1.5 |            24 |
+|       1 |   1.5 |           182 |
+|       0 |   2.0 |            94 |
+|       1 |   2.0 |           472 |
+|       0 |   2.5 |           168 |
+|       1 |   2.5 |           722 |
+|       0 |   3.0 |           272 |
+|       1 |   3.0 |          1124 |
+|       0 |   3.5 |           295 |
+|       1 |   3.5 |          1483 |
+|       0 |   4.0 |           326 |
+|       1 |   4.0 |          1679 |
+|       0 |   4.5 |           189 |
+|       1 |   4.5 |          1249 |
+|       0 |   5.0 |           138 |
+|       1 |   5.0 |          1427 |
++---------+-------+---------------+
+_______________________________________________________________________________________
+SELECT is_open, state, COUNT(is_open)
+FROM business 
+GROUP BY is_open, state
+ORDER BY  state
+
++---------+-------+----------------+
+| is_open | state | COUNT(is_open) |
++---------+-------+----------------+
+|       0 | AZ    |            452 |
+|       1 | AZ    |           2590 |
+|       0 | BW    |             21 |
+|       1 | BW    |            181 |
+|       1 | C     |              3 |
+|       0 | EDH   |             51 |
+|       1 | EDH   |            186 |
+|       0 | ELN   |              2 |
+|       1 | ELN   |              4 |
+|       1 | ESX   |              1 |
+|       1 | FIF   |              5 |
+|       0 | HLD   |              1 |
+|       1 | HLD   |             11 |
+|       0 | IL    |             14 |
+|       1 | IL    |             94 |
+|       0 | MLN   |              3 |
+|       1 | MLN   |              5 |
+|       0 | NC    |             96 |
+|       1 | NC    |            626 |
+|       0 | NI    |              1 |
+|       1 | NI    |              1 |
+|       0 | NV    |            300 |
+|       1 | NV    |           1621 |
+|       1 | NY    |              3 |
+|       1 | NYK   |              3 |
++---------+-------+----------------+
+(Output limit exceeded, 25 of 39 total rows shown)
+
+
+
+_______________________________________________________________________________________
+
++------------------------+----------+
+| business_id            | COUNT(*) |
++------------------------+----------+
+| --9e1ONYQuAa-CB_Rrw7Tw |        4 |
+| --cZ6Hhc9F7VkKXxHMVZSQ |        2 |
+| -050d_XIor1NpCuWkbIVaQ |        1 |
+| -0NrB58jqKqJfuUCDupcsw |        1 |
+| -0tgMGl7D9B10YjSN2ujLA |        2 |
+| -1UMR00eXtwaeh59pEiDjA |        1 |
+| -1xuC540Nycht_iWFeJ-dw |        1 |
+| -2TKoFglMQvSmHSNWf6S8Q |        1 |
+| -2uhc4spgMqJMy0YSxConA |        1 |
+| -38Kck4mGlkBwd6OXayZRg |        1 |
+| -3QHAylnVB-vNmCg2Rf5aw |        1 |
+| -3zffZUHoY8bQjGfPSoBKQ |        2 |
+| -5L8zOxibac-vBrsYtxXbQ |        1 |
+| -5NXoZeGBdx3Bdk70tuyCw |        1 |
+| -5TBEK1ddM41v_gqGm5oyw |        1 |
+| -6tvduBzjLI1ISfs3F_qTg |        1 |
+| -7H-oXvCxJzuT42ky6Db0g |        2 |
+| -7PX_FOoCwktlunImRyZdg |        1 |
+| -82Z0wTA-nOCLUVD4XXIBA |        1 |
+| -8O8sVCnaIKHP-596zN9UA |        1 |
+| -8QlV3b_9H4BAh6LgMIr1g |        1 |
+| -8ZiMXZReeTD3kwEvS0Lww |        1 |
+| -92cC6-X87HQ1DE1UHOx3w |        1 |
+| -95mbLJsa0CxXhpaNL4LvA |        1 |
+| -9YyInW1wapzdNZrhQJ9dg |        2 |
++------------------------+----------+
+(Output limit exceeded, 25 of 8090 total rows shown)
+
+_______________________________________________________________________________________
+
+SELECT  b.is_open, COUNT(r.id) AS total_review
+FROM business b
+LEFT JOIN  review r 
+ON r.business_id = b.id 
+GROUP BY is_open 
+
++---------+----------------+
+| is_open | total_review |
++---------+----------------+
+|       0 |             71 |
+|       1 |            565 |
++---------+----------------+
+
+_______________________________________________________________________________________
+SELECT b.is_open, SUM(c.count) AS total_checkin
+FROM business b 
+LEFT JOIN checkin c
+ON b.id = c.business_id
+GROUP BY b.is_open
+
++---------+---------------+
+| is_open | total_checkin |
++---------+---------------+
+|       0 |            15 |
+|       1 |           823 |
++---------+---------------+
+
++---------------+
+| total_checkin |
++---------------+
+|         19414 |
++---------------+
+
+_______________________________________________________________________________________
+
+SELECT b.is_open, SUM(c.count) AS total_checkin, COUNT(c.business_id) 
+FROM business b 
+LEFT JOIN checkin c
+ON b.id = c.business_id
+GROUP BY b.is_open
+
++---------+---------------+----------------------+
+| is_open | total_checkin | COUNT(c.business_id) |
++---------+---------------+----------------------+
+|       0 |            15 |                   12 |
+|       1 |           823 |                  498 |
++---------+---------------+----------------------+
+
+
+_______________________________________________________________________________________
+
+SELECT c.business_id, b.is_open, c.count
+FROM business b 
+LEFT JOIN checkin c 
+ON b.id = c.business_id 
+WHERE  c.business_id != 'None'
+
++------------------------+---------+-------+
+| business_id            | is_open | count |
++------------------------+---------+-------+
+| -3TbEJnrhu1cZdbbinol4A |       1 |     2 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     2 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     2 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     2 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     3 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -3TbEJnrhu1cZdbbinol4A |       1 |     1 |
+| -49WY_TEa9ZEcRk_GnuLog |       1 |     1 |
+| -49WY_TEa9ZEcRk_GnuLog |       1 |     3 |
++------------------------+---------+-------+
+(Output limit exceeded, 25 of 510 total rows shown)
+
+_______________________________________________________________________________________
+
+
+SELECT b.is_open, SUM(c.count) AS checkin_total 
+FROM business b 
+LEFT JOIN checkin c
+ON b.id = c.business_id
+GROUP BY is_open
+
++---------+---------------+
+| is_open | checkin_total |
++---------+---------------+
+|       0 |            15 |
+|       1 |           823 |
++---------+---------------+
+
+
+_______________________________________________________________________________________
+
+
+
+_______________________________________________________________________________________
