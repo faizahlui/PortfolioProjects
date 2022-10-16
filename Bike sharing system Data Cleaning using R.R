@@ -419,7 +419,7 @@ ggplot(data=data) +
   theme_bw()
 
 
-# Plot line graph for the 
+# Plot line graph for the hourly trend of the total number of riders 
 data %>% 
   group_by(start_hour, member_casual) %>%
   summarise(total_ride = n()) %>%
