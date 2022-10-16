@@ -4,12 +4,17 @@
 install.packages("tidyverse") # for data import and wrangling
 install.packages("lubridate") #helps to wrangle date attributes
 install.packages("ggplot2") # for data visualization 
-#therefore latest version is ggplot2 
+install.packages("maps") # for drawing basic geographical maps
+
 
 #loading library
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
+library(maps)
+
+options(scipen = 999)   # Modify global options in R to not use scientific notation such as 1e+100
+
 
 ##Import data
 
@@ -85,8 +90,6 @@ colnames(df12)
 #checking total columns each data frames has using ncol(df), 
 #based on the data shown that the total column is not consistent but the name is consistent
 # 15 cols : df2, df3, df10, 
-#Note: The original data was actually consistent in total, however for the purpose of studying, 
-#I tried to make some amendment to the data with additional columns
 ncol(df1)
 ncol(df2)
 ncol(df3)
@@ -100,14 +103,6 @@ ncol(df10)
 ncol(df11)
 ncol(df12)
 
-#checking what will happened if I continue 
-#to merge dataframes when it is inconsistent? 
-#merge dataframe using the function rbind 
-
-####new_df <- rbind(df1,df2,df3,df4,df5,df6,df7,df8,df9,df10,df11,df12)
-
-#above code chunks produced error, due to number of columns doesnt match
-
 #remove columns name 
 #editing existing dataframe, by eliminating the relevant columns using select(funtion)
 # Dplyr remove multiple columns by name:
@@ -120,10 +115,8 @@ df10_new <- select(df10, -c(ride_length,day_of_week.))
 
 new_df <- rbind(df1,df2_new,df3_new,df4,df5,df6,df7,df8,df9,df10_new,df11,df12)
 
-#using mutate(), create new variable in the data frame created, but not to the original imported data
 
-
-## STEP 3: CLEAN UP AND ADD DATA TO PREPARE FOR ANALYSIS
+##CLEAN UP AND ADD DATA TO PREPARE FOR ANALYSIS
 
 #Extract Unique Values in R (3 Examples)using distinct() or duplicated() or  unique()
 
@@ -154,31 +147,23 @@ new_df$month <- format(as.Date(new_df$start_date), "%m") #numerical month  (00-1
 new_df$day <- format(as.Date(new_df$start_date), "%d") # day as Number (1-31)
 new_df$year <- format(as.Date(new_df$start_date), "%Y") #4 digit year
 new_df$day_of_week <- format(as.Date(new_df$start_date), "%A") #unabbreviated weekday (Monday)
+new_df$start_hour <- format(as.POSIXct(new_df$started_at), format = "%H") #retrieve start time hour 
+new_df$end_hour <- format(as.POSIXct(new_df$ended_at), format = "%H") #retrieve start time hour 
 
-#R read columns started_at & ended_at as character class. Below we will convert the class
-# from char to date 
-# df1 <- df %>% 
+#R read columns started_at & ended_at as character class. Below we will convert the class from char to date 
+#df1 <- df %>% 
 #mutate(x = dmy_hms(x))
-
 new_df <- new_df %>% mutate(started_at = ymd_hms(started_at)) 
 new_df <- new_df %>% mutate(ended_at = ymd_hms(ended_at)) 
-
-
-
-# Add a "ride_length" calculation to all_trips (in seconds)
-# https://stat.ethz.ch/R-manual/R-devel/library/base/html/difftime.html
-new_df$ride_length <- difftime(new_df$ended_at,new_df$started_at)
+new_df$ride_length <- difftime(new_df$ended_at,new_df$started_at) # Add a "ride_length" calculation to all_trips (in seconds)
 
 #remove bad data based on below criterion:-
 # 1. ride_length = -ve 
 # 2. started_at = NA 
 
-# The dataframe includes a few hundred entries when bikes were taken out of docks and checked for 
-#quality by Divvy or ride_length was negative or data are NA
+# The dataframe includes a few hundred entries when bikes were taken out of docks and checked for quality or ride_length was negative or data are NA
 # We will create a new version of the dataframe (v2) sice data is being removed
-# https://www.datasciencemadesimple.com/delete-or-drop-rows-in-r-with-conditions-2/
 new_df_clean <- new_df[!(new_df$start_station_name == "HQ QR" | new_df$ride_length<0 | new_df$ride_length =="NA"),]
-
 
 #df1_complete = na.omit(df1) --- remove NA using omit function in the entire data frame
 new_df4 <- na.omit(new_df_clean) 
@@ -189,7 +174,7 @@ new_df4<- filter (new_df, ride_length > 0 )
 new_df4$duration_min <- seconds_to_period(new_df4$ride_length)
 
 
-#checking unique value of the duration (days).  
+#Descriptive analysis on duration   (days)
 unique(new_df4$duration) # unique value of the duration column
 mean(new_df4$duration) #average of the duration
 median(new_df4$duration) #midpoint number in the ascending array of duration 
@@ -197,13 +182,6 @@ max(new_df4$duration) #longest duration
 min(new_df4$duration) #shortest duration
 
 
-
-
-# EXPLORATORY DATA ANALYSIS SECTION 
-
-#=====================================
-# STEP 4: CONDUCT DESCRIPTIVE ANALYSIS 
-#=====================================
 # Descriptive analysis on ride_length (all figures in seconds)
 mean(new_df4$ride_length) #straight average (total ride length / rides)
 median(new_df4$ride_length) #midpoint number in the ascending array of ride lengths
@@ -212,6 +190,7 @@ min(new_df4$ride_length) #shortest ride
 
 
 # You can condense the four lines above to one line using summary() on the specific attribute
+summary(new_df4$duration)
 summary(new_df4$ride_length)
 
 # Compare members and casual users
@@ -219,7 +198,6 @@ aggregate(new_df4$ride_length ~ new_df4$member_casual, FUN = mean)
 aggregate(new_df4$ride_length ~ new_df4$member_casual, FUN = median)
 aggregate(new_df4$ride_length ~ new_df4$member_casual, FUN = max)
 aggregate(new_df4$ride_length ~ new_df4$member_casual, FUN = min)
-table(new_df4$duration)
 
 
 # See the average ride time by each day for members vs casual users
@@ -264,16 +242,191 @@ new_df4 %>%
 ggplot(data = new_df4)  +
   geom_histogram(mapping=aes(x=duration), fill= "red", bins=10)
 
-# count duration descriptive 
+
+##################################################################################################################################################
+#-- From this point onwards my computer keeps crashing, and I have saved and created new csv file using the merged file "new_df4" using write.csv. 
+#--so below codes has been omited as they are repetitive and stored in a separate file in my computer. 
+##################################################################################################################################################
+
+
+#import data in csv files once again
+data <- read.csv("New_df4.csv")
+
+
+head(data)
+ncol(data)
+nrow(data)
+str(data)
+glimpse(data)
+
+
+unique(data$ride_id)
+unique(data$rideable_type)
+unique(data$member_casual)
+unique(data$duration_min)
+unique(data$year)
+
+
+#descriptive analysis for numerical data type
+summary(data$ride_length) # show Min, 1st Qu,Median,Mean,3rd Qu,Max, for numerical dataset, 
+summary(data$duration) # duration for days 
+summary(data$duration_min)
+
+
+#create histogram for ride_length 
+#bin default set to 30 
+ggplot(data = data) + 
+  geom_histogram(mapping=aes(x=ride_length), fill="#69b3a2", color="purple") 
+
+
+# create boxplot for ride_length,  checking outliers
+ggplot(data=data) +
+  geom_boxplot(mapping= aes(y=ride_length)) # or use "boxplot(data$ride_length)" for numerical data only 
 
 
 
+# explore the data by bike category 
 
-#=================================================
-# STEP 5: EXPORT SUMMARY FILE FOR FURTHER ANALYSIS
-#=================================================
-# Create a csv file that we will visualize in Excel, Tableau, or my presentation software
-# N.B.: This file location is for a Mac. If you are working on a PC, change the file location accordingly (most likely "C:\Users\YOUR_USERNAME\Desktop\...") to export the data. You can read more here: https://datatofish.com/export-dataframe-to-csv-in-r/
-counts <- aggregate(new_df4$ride_length ~ new_df4$member_casual + new_df4$day_of_week, FUN = mean)
-write.csv(counts, file = 'D:/avg_ride_length.csv')
+#box plot for different category of the rideable type. 
+ggplot(data=data) +
+  geom_boxplot(mapping= aes(x=rideable_type, y=ride_length)) # or use "boxplot(data$ride_length)" for numerical data only 
+   
+
+#seems like there is too much outlier for this ride_length data. However, we also cannot conclude this as 
+#noise that might distort the visualization/ analysis. There may be customers who did rent the bike for 37 days. 
+#I dont want to remove the outliers yet. So let's zoom in by setting the limit for the y axis 
+ggplot(data=data) +
+  geom_boxplot(mapping= aes(x=rideable_type, y=ride_length)) +
+  ylim(0,3000)
+
+
+# bar chart for membership count 
+ggplot(data=data) +
+  geom_bar(mapping= aes( x=member_casual)) 
+
+#bar chart for membership vs ride length
+ggplot(data=data) +
+  geom_col(mapping = aes(x=member_casual, y=ride_length ))
+                                                                   
+# column bar based on the category                                                                                                                              
+ggplot(data=data) + 
+    geom_col(mapping= aes(x=member_casual, y=ride_length)) +
+  facet_wrap(~rideable_type) + 
+  labs(title = "Ride Length based on bike type",
+       caption = "example",
+       x = "" ,
+       y = "Ride Length" )
+  
+#boxplot for duration
+ggplot(data=data)+
+  geom_boxplot(mapping= aes(y=duration))
+
+
+
+data %>%
+  group_by(rideable_type, member_casual) %>%  
+  summarise(number_of_rides = n()							
+            ,average_duration = mean(ride_length)) %>% 	
+  arrange(rideable_type,member_casual)	%>%
+  ggplot(aes(x = rideable_type, y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge") +
+  theme(axis.text.x = element_text( color="#993333", angle=12))
+
+data %>%
+  group_by(rideable_type, member_casual) %>%  
+  summarise(total_length = sum(ride_length)					
+            ,average_duration = mean(ride_length)) %>% 	
+  arrange(member_casual)	%>%
+  ggplot(aes(x = rideable_type, y = total_length, fill = member_casual)) +
+  geom_col(position = "dodge") +
+  theme(axis.text.x = element_text( color="#993333", angle=12))
+
+
+# boxplot for the number of rides for bike category
+
+data %>%
+  group_by(rideable_type)%>% 
+  summarise(total_rides = n()) %>%
+  ggplot(aes (x=rideable_type, y=total_rides))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text( color="#993333", angle=12))
+
+# daily trend - total rides 
+data %>% 
+  group_by(day_of_week, member_casual) %>%
+  summarise(total_rides=n())%>%
+  arrange(day_of_week)%>%
+  ggplot(aes(x=day_of_week, y= total_rides, fill= member_casual))+ 
+  geom_col(position = "dodge")
+
+#daily trend - ride length 
+
+data %>% 
+  group_by(day_of_week, member_casual) %>%
+  summarise(total_length = sum(ride_length))%>%
+  arrange(day_of_week)%>%
+  ggplot(aes(x=day_of_week, y= total_length, fill= member_casual))+ 
+  geom_col(position = "dodge") + 
+  theme(axis.text.x = element_text( angle=12))
+
+
+# ride length by month
+
+data %>% 
+  mutate(Month= month(month,label=TRUE))%>%
+  group_by(Month , member_casual) %>%
+  summarise(total_length = sum(ride_length)) %>%
+  ggplot(aes(x=Month, y = total_length, group= member_casual, colour =member_casual))+ 
+  geom_line() + 
+  geom_point()
+
+
+# let's explore the data location longitude & latitude
+# start location 
+ggplot(data = data, aes(x = start_lng, y = start_lat)) + 
+  geom_point() 
+
+#end location
+ggplot(data = data, aes(x = end_lng, y = end_lat)) + 
+  geom_point()
+
+
+# let's merge both the start & end location point. 
+ggplot(data=data) +
+  geom_point(mapping= aes(x = start_lng, y = start_lat)) + 
+  geom_point(mapping= aes(x = end_lng, y = end_lat))
+
+  
+  
+  
+# let's see the starting point popularity
+data%>% 
+  group_by(start_lng, start_lat) %>%
+  summarise(total_station=n()) %>%
+  arrange(-total_station)
+
+# end_point popularity 
+data%>% 
+  group_by(end_lng, end_lat) %>%
+  summarise(total_station=n()) %>%
+  arrange(-total_station)
+
+#let's plot some basic map of this dataset:- 
+#Note : my computer just shuts down on it's own when I compute below code & it took really long to compute 
+#I will use Power BI as an alternative to visualize the data location. 
+ggplot(data=data) +
+  geom_polygon( aes(x = start_lng, y =start_lat)) +
+  theme_bw()
+
+
+# Plot line graph for the 
+data %>% 
+  group_by(start_hour, member_casual) %>%
+  summarise(total_ride = n()) %>%
+  ggplot(aes(x=start_hour, y= total_ride, group=member_casual, colour=member_casual))+ 
+  geom_line()+
+  geom_point()
+
+
+
 
