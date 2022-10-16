@@ -1,9 +1,9 @@
-## Step 1: Load packages
+## Load packages
 
 #Load/ install  all relevant packages 
 install.packages("tidyverse") # for data import and wrangling
 install.packages("lubridate") #helps to wrangle date attributes
-install.packages("ggplot2") # for data visualization // Note : ggplot no longer can be used in this version
+install.packages("ggplot2") # for data visualization 
 #therefore latest version is ggplot2 
 
 #loading library
@@ -11,12 +11,10 @@ library(tidyverse)
 library(lubridate)
 library(ggplot2)
 
-## Step 2: Import data
+##Import data
 
-#check directory paths, make sure that the file 
-#path is correct using getwd() / setwd()
-#in this case my working directory is already correct 
-# & will proceed to import the datas
+#check directory paths, make sure that the file path is correct using getwd() / setwd()
+#in this case my working directory is already correct & will proceed to import the datas
 #getwd() --> get working directory 
 #setwd()--> set working directory 
 getwd()
@@ -38,13 +36,11 @@ df11 <- read.csv("202203-cyclistic-tripdata.csv")
 df12 <- read.csv("202204-cyclistic-tripdata.csv")
 
 
-## Step 3: Inspect & clean AND ADD data 
+## Inspect, clean & add data 
 
-#reviewing the data files, & check if the columns are consistent before compliling
-#Here I am using a few options and show some ways the data can be reviewed
+#reviewing the data files, & check if the columns are consistent before compliling Here I am using a few options and show some ways the data can be reviewed
 
-#using head() returns the columns and first 5  
-#rows of data including the header
+#using head() returns the columns and first 5  rows of data including the header
 head(df1)
 head(df2)
 head(df3)
@@ -72,8 +68,7 @@ str(df10)
 str(df11)
 str(df12)
 
-#using colnames () to find out the columns
-# in the dataframe. Findings shown that the columns are not consistent. 
+#using colnames () to find out the columns in the dataframe. Findings shown that the columns are not consistent. 
 colnames(df1)
 colnames(df2)
 colnames(df3)
